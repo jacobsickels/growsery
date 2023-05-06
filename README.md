@@ -26,3 +26,17 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+
+# Making new migrations
+
+It's really important to run this command when you make prisma schema changes
+```
+prisma migrate dev --name <name>
+```
+
+This makes a new migration under the prisma/migrations folder with the name appended to the folder.
+These migrations are run in order depending on the time prefix. 
+
+We're running migrations with the `prisma migrate deploy` as part of the build step in the CI. So, this means that
+all we need to do is make sure that these migrations are backwards compatible and can be applied in the CI.
