@@ -8,6 +8,7 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "dev:migrate": "prisma migrate dev",
+    "prod:migrate": "prisma migrate resolve",
     "start": "next start"
   },
   "dependencies": {
