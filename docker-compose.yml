@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  mysql:
+    container_name: postgres
+    ports:
+      - 5432:5432
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dev
+
