@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  mysql:
-    container_name: postgres
+  growsery-postgres:
+    container_name: growsery-postgres
     ports:
       - 5432:5432
     image: postgres:alpine
