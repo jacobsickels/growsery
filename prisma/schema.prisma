@@ -26,6 +26,7 @@ model Ingredient {
 
 model Recipe {
     id          String       @id @default(cuid())
+    name        String
     description String?
     ingredients Ingredient[]
     group       Group?       @relation(fields: [groupId], references: [id])

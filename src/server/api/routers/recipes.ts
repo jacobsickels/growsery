@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
+import { prisma } from "~/server/db";
 
 export const recipeRouter = createTRPCRouter({
   hello: publicProcedure
@@ -8,5 +13,21 @@ export const recipeRouter = createTRPCRouter({
       return {
         greeting: `Hello ${input.text}`,
       };
+    }),
+
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        servings: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const recipe = await prisma.recipe.create({
+        data: { ...input, userId: ctx.session.user.id },
+      });
+
+      return recipe;
     }),
 });
