@@ -12,15 +12,31 @@ type FormState = {
   servings: string;
 };
 
-export const CreateRecipe = () => {
+export const EditRecipe = () => {
   const router = useRouter();
   const { mutate } = api.recipes.upsert.useMutation();
+  const { register, handleSubmit, setValue } = useForm<FormState>();
 
-  const { register, handleSubmit } = useForm<FormState>();
+  const recipeId = router.query.id as string;
+
+  const { isLoading } = api.recipes.get.useQuery(
+    {
+      id: recipeId,
+    },
+    {
+      onSuccess: (recipe) => {
+        if (recipe) {
+          setValue("name", recipe.name);
+          setValue("description", recipe.description || undefined);
+          setValue("servings", `${recipe.servings || 1}`);
+        }
+      },
+    }
+  );
 
   const onSubmit = handleSubmit((data: FormState) => {
     mutate(
-      { ...data, servings: parseInt(data.servings || "1", 10) },
+      { ...data, servings: parseInt(data.servings, 10), id: recipeId },
       {
         onSuccess: () => {
           void router.push("/recipes");
@@ -29,9 +45,13 @@ export const CreateRecipe = () => {
     );
   });
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <form className="flex flex-col" onSubmit={(e) => void onSubmit(e)}>
-      <Typography.H1>Create Recipe</Typography.H1>
+      <Typography.H1>Edit Recipe</Typography.H1>
 
       <TextField label="Name" {...register("name")} />
       <TextField label="Description" {...register("description")} />
@@ -42,4 +62,4 @@ export const CreateRecipe = () => {
   );
 };
 
-export default CreateRecipe;
+export default EditRecipe;
