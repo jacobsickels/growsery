@@ -40,7 +40,7 @@ export const recipeRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const recipe = await prisma.recipe.upsert({
-        where: { id: input.id },
+        where: { id: input.id || "create-id" },
         update: input,
         create: { ...input, userId: ctx.session.user.id },
       });
