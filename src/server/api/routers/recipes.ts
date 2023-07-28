@@ -25,6 +25,13 @@ export const recipeRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const recipe = await prisma.recipe.findUnique({
         where: { id: input.id },
+        include: {
+          ingredients: {
+            include: {
+              produce: true,
+            },
+          },
+        },
       });
 
       return recipe;
@@ -43,6 +50,71 @@ export const recipeRouter = createTRPCRouter({
         where: { id: input.id || "create-id" },
         update: input,
         create: { ...input, userId: ctx.session.user.id },
+      });
+
+      return recipe;
+    }),
+  updateIngredients: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().optional(),
+        ingredients: z.array(
+          z.object({
+            id: z.string().optional(),
+            amount: z.number(),
+            unit: z.object({
+              label: z.string(),
+              value: z.enum([
+                "NONE",
+                "OUNCE",
+                "POUND",
+                "TABLE_SPOON",
+                "TEA_SPOON",
+                "CUP",
+                "FLUID_OUNCE",
+                "PINT",
+                "QUART",
+                "GALLON",
+              ]), // Should be Unit Enum
+            }),
+            produceId: z.string().optional(),
+            produceName: z.string(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const recipe = await prisma.recipe.update({
+        where: { id: input.id },
+        data: {
+          ingredients: {
+            upsert: input.ingredients.map((ingredient) => ({
+              where: {
+                id: ingredient.id || "upsert-ingredient",
+              },
+              update: {
+                amount: ingredient.amount,
+                unit: ingredient.unit.value,
+                produce: {
+                  connectOrCreate: {
+                    where: { id: ingredient.produceId || "connected-produce" },
+                    create: { name: ingredient.produceName },
+                  },
+                },
+              },
+              create: {
+                amount: ingredient.amount,
+                unit: ingredient.unit.value,
+                produce: {
+                  connectOrCreate: {
+                    where: { id: ingredient.produceId || "connected-produce" },
+                    create: { name: ingredient.produceName },
+                  },
+                },
+              },
+            })),
+          },
+        },
       });
 
       return recipe;

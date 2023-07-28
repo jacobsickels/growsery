@@ -7,10 +7,27 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum Unit {
+    NONE
+
+    // Metic Units
+    OUNCE
+    POUND
+    TABLE_SPOON
+    TEA_SPOON
+    CUP
+
+    // Imperial Units
+    FLUID_OUNCE
+    PINT
+    QUART
+    GALLON
+}
+
 model Produce {
     id         String       @id @default(cuid())
     name       String
-    Ingredient Ingredient[]
+    ingredient Ingredient[]
 }
 
 model Ingredient {
@@ -18,10 +35,11 @@ model Ingredient {
     recipe         Recipe?       @relation(fields: [recipeId], references: [id])
     recipeId       String?
     produce        Produce       @relation(fields: [produceId], references: [id])
+    produceId      String
     amount         Decimal
+    unit           Unit          @default(NONE)
     ShoppingList   ShoppingList? @relation(fields: [shoppingListId], references: [id])
     shoppingListId String?
-    produceId      String
 }
 
 model Recipe {
