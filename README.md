@@ -27,7 +27,7 @@ openssl rand -base64 32
 
 Create a new `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` by navigating to the [Discord Developer Console](https://discord.com/developers) and hitting the `New Application` button. After doing this navigate to the OAuth2 tab on the left and you will be presented with a `Client Information` section where you can copy the values for the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` respectively from your newly created Discord client application.
 
-As noted below, we will probably change to a Google authentication client in the future, but for now Discord works fine. It won't be hard for us to change (or even have both working at the same time) in the future.
+Create a new `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` by following the directions on here [Next Auth Google Provider](https://next-auth.js.org/providers/google)
 
 ### Starting the application
 

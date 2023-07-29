@@ -2,7 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Paper } from "@/components/ui/paper";
 import { Textarea } from "@/components/ui/textarea";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { Page } from "~/components/Page";
@@ -41,7 +43,7 @@ export const EditRecipe = () => {
       { ...data, servings: parseInt(data.servings, 10), id: recipeId },
       {
         onSuccess: () => {
-          void router.push("/recipes");
+          void router.push("/recipes/" + recipeId);
         },
       }
     );
@@ -53,26 +55,31 @@ export const EditRecipe = () => {
 
   return (
     <Page title="Edit Recipe" backLink={"/recipes/" + recipeId}>
-      <div className="grid grid-cols-2">
-        <div>
-          <form
-            className="flex flex-col space-y-4"
-            onSubmit={(e) => void onSubmit(e)}
-          >
+      <form onSubmit={(e) => void onSubmit(e)}>
+        <Paper className="flex flex-col space-y-4">
+          <div className="grid grid-cols-2">
             <Input label="Name" {...register("name")} />
+          </div>
+          <div className="grid grid-cols-2">
             <Textarea label="Description" {...register("description")} />
+          </div>
+          <div className="grid grid-cols-2">
             <Input
               label="Servings"
               type="number"
               {...register("servings", { valueAsNumber: true })}
             />
-
-            <div className="mt-4 flex justify-end">
+            <div className="mt-6 flex justify-end space-x-4">
+              <Link href="/recipes">
+                <Button variant="outline" type="button">
+                  Cancel
+                </Button>
+              </Link>
               <Button type="submit">Save</Button>
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
+        </Paper>
+      </form>
     </Page>
   );
 };

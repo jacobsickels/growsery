@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Servings } from "@/components/ui/servings";
+import { Paper } from "@/components/ui/paper";
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Page } from "~/components/Page";
@@ -20,10 +20,7 @@ export const Recipies = () => {
       }
     >
       {data?.map((recipe) => (
-        <div
-          key={recipe.id}
-          className="my-2 flex border-l-8 border-blue-500 bg-blue-300 p-4"
-        >
+        <Paper key={recipe.id}>
           <div className="flex flex-1 flex-row">
             <div className="items-top mt-1 flex space-x-4">
               <Checkbox id={"recipe-" + recipe.id} />
@@ -34,23 +31,21 @@ export const Recipies = () => {
                 {recipe.name}
               </Label>
             </div>
-
-            <Servings servings={recipe.servings} />
           </div>
 
           <div className="flex">
             <div className="mx-2 my-1">
               <Link href={"/recipes/" + recipe.id}>
-                <Pencil />
+                <Pencil className="hover:text-primary" />
               </Link>
             </div>
             <div className="mx-2 mt-1">
               <button>
-                <Trash2 />
+                <Trash2 className="hover:text-primary" />
               </button>
             </div>
           </div>
-        </div>
+        </Paper>
       ))}
     </Page>
   );

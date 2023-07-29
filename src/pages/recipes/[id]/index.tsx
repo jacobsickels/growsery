@@ -10,6 +10,7 @@ import { ProduceSelect } from "~/components/ProduceSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Paper } from "@/components/ui/paper";
 import { Servings } from "@/components/ui/servings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Unit } from "@prisma/client";
@@ -123,87 +124,88 @@ export const ViewRecipe = () => {
       title={recipe.name}
       backLink="/recipes"
       actions={
-        <Link href={"/recipes/edit/" + recipe.id}>
-          <Button variant="secondary">Edit Recipe</Button>
-        </Link>
+        <>
+          <Servings servings={recipe?.servings} />
+          <Link href={"/recipes/edit/" + recipe.id} className="ml-4">
+            <Button variant="outline">Edit Recipe</Button>
+          </Link>
+        </>
       }
     >
       <div className="mb-8 flex">
         <Typography.P className="flex-1 text-slate-600">
           {recipe?.description}
         </Typography.P>
-        <div className="ml-16">
-          <Servings servings={recipe?.servings} />
-        </div>
       </div>
 
       <Typography.H2>Ingredients</Typography.H2>
 
-      <form
-        className="flex flex-col space-y-4"
-        onSubmit={(e) => void onSubmit(e)}
-      >
-        {fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-2 space-x-4">
-            <Controller
-              name={`ingredients.${index}.produce`}
-              control={control}
-              render={({ field }) => (
-                <ProduceSelect
-                  {...field}
-                  label="Name"
-                  id={`ingredients.${index}.produce`}
-                  error={errors.ingredients?.[index]?.produce?.message}
-                />
-              )}
-            />
-
-            <div className="grid grid-cols-3 space-x-4">
-              <Input
-                type="number"
-                label="Amount"
-                id={`ingredients.${index}.amount`}
-                {...register(`ingredients.${index}.amount`, {
-                  valueAsNumber: true,
-                })}
-                error={errors.ingredients?.[index]?.amount?.message}
-              />
-
+      <form onSubmit={(e) => void onSubmit(e)}>
+        <Paper className="flex flex-col space-y-4">
+          {fields.map((field, index) => (
+            <div key={field.id} className="grid grid-cols-2 space-x-4">
               <Controller
-                name={`ingredients.${index}.unit`}
+                name={`ingredients.${index}.produce`}
                 control={control}
                 render={({ field }) => (
-                  <div>
-                    <Label htmlFor={`ingredients.${index}.unit`}>Unit</Label>
-                    <Select
-                      {...field}
-                      options={UNITS}
-                      id={`ingredients.${index}.unit`}
-                    />
-
-                    <p>{errors.ingredients?.[index]?.unit?.message}</p>
-                  </div>
+                  <ProduceSelect
+                    {...field}
+                    label="Name"
+                    id={`ingredients.${index}.produce`}
+                    error={errors.ingredients?.[index]?.produce?.message}
+                  />
                 )}
               />
 
-              <div className="flex justify-end">
-                <Trash2 className="mt-7" />
+              <div className="grid grid-cols-3 space-x-4">
+                <Input
+                  type="number"
+                  label="Amount"
+                  id={`ingredients.${index}.amount`}
+                  {...register(`ingredients.${index}.amount`, {
+                    valueAsNumber: true,
+                  })}
+                  error={errors.ingredients?.[index]?.amount?.message}
+                />
+
+                <Controller
+                  name={`ingredients.${index}.unit`}
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <Label htmlFor={`ingredients.${index}.unit`}>Unit</Label>
+                      <Select
+                        {...field}
+                        options={UNITS}
+                        id={`ingredients.${index}.unit`}
+                      />
+
+                      <p>{errors.ingredients?.[index]?.unit?.message}</p>
+                    </div>
+                  )}
+                />
+
+                <div className="mt-7 flex justify-end">
+                  <button type="button">
+                    <Trash2 className="hover:text-primary" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        <div className="my-4 flex justify-center">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() =>
-              append({ amount: "0", unit: { label: "None", value: "NONE" } })
-            }
-          >
-            Add Ingredient
-          </Button>
-        </div>
+          <div className="my-4 flex justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                append({ amount: "0", unit: { label: "None", value: "NONE" } })
+              }
+            >
+              Add Ingredient
+            </Button>
+          </div>
+        </Paper>
 
         <div className="flex justify-end">
           <Button type="submit">Save</Button>

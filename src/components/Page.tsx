@@ -15,7 +15,7 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
     <div className="container mx-auto mt-8 content-center">
       {backLink && (
         <Link href={backLink}>
-          <Button variant="secondary" className="mb-4">
+          <Button variant="ghost" className="mb-4">
             <ChevronLeft className="-ml-2 mr-2" /> Back
           </Button>
         </Link>
