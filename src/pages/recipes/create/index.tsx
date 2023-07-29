@@ -1,15 +1,17 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { TextField } from "~/components/TextField";
-import { Typography } from "~/components/Typography";
+import { Page } from "~/components/Page";
 import { api } from "~/utils/api";
 
 type FormState = {
   name: string;
   description?: string;
-  servings: string;
+  servings: number;
 };
 
 export const CreateRecipe = () => {
@@ -19,26 +21,36 @@ export const CreateRecipe = () => {
   const { register, handleSubmit } = useForm<FormState>();
 
   const onSubmit = handleSubmit((data: FormState) => {
-    mutate(
-      { ...data, servings: parseInt(data.servings || "1", 10) },
-      {
-        onSuccess: () => {
-          void router.push("/recipes");
-        },
-      }
-    );
+    mutate(data, {
+      onSuccess: () => {
+        void router.push("/recipes");
+      },
+    });
   });
 
   return (
-    <form className="flex flex-col" onSubmit={(e) => void onSubmit(e)}>
-      <Typography.H1>Create Recipe</Typography.H1>
+    <Page title="Create Recipe" backLink={"/recipes"}>
+      <div className="grid grid-cols-2">
+        <div>
+          <form
+            className="flex flex-col space-y-4"
+            onSubmit={(e) => void onSubmit(e)}
+          >
+            <Input label="Name" {...register("name")} />
+            <Textarea label="Description" {...register("description")} />
+            <Input
+              label="Servings"
+              type="number"
+              {...register("servings", { valueAsNumber: true })}
+            />
 
-      <TextField label="Name" {...register("name")} />
-      <TextField label="Description" {...register("description")} />
-      <TextField label="Servings" type="number" {...register("servings")} />
-
-      <button type="submit">Save</button>
-    </form>
+            <div className="mt-4 flex justify-end">
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Page>
   );
 };
 
