@@ -3,17 +3,12 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 
 export const recipeRouter = createTRPCRouter({
-  // hello: publicProcedure
-  //   .input(z.object({ text: z.string() }))
-  //   .query(({ input }) => {
-  //     return {
-  //       greeting: `Hello ${input.text}`,
-  //     };
-  //   }),
-
   list: protectedProcedure.query(async ({ ctx }) => {
     return await prisma.recipe.findMany({
-      where: { userId: ctx.session.user.id },
+      where: {
+        userId: ctx.session.user.id,
+        groupId: ctx.session.user.actingGroupId,
+      },
     });
   }),
   get: protectedProcedure
@@ -49,7 +44,11 @@ export const recipeRouter = createTRPCRouter({
       const recipe = await prisma.recipe.upsert({
         where: { id: input.id || "create-id" },
         update: input,
-        create: { ...input, userId: ctx.session.user.id },
+        create: {
+          ...input,
+          userId: ctx.session.user.id,
+          groupId: ctx.session.user.actingGroupId,
+        },
       });
 
       return recipe;
