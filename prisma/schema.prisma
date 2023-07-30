@@ -31,15 +31,13 @@ model Produce {
 }
 
 model Ingredient {
-    id             String        @id @default(cuid())
-    recipe         Recipe?       @relation(fields: [recipeId], references: [id])
-    recipeId       String?
-    produce        Produce       @relation(fields: [produceId], references: [id])
-    produceId      String
-    amount         Decimal
-    unit           Unit          @default(NONE)
-    ShoppingList   ShoppingList? @relation(fields: [shoppingListId], references: [id])
-    shoppingListId String?
+    id        String  @id @default(cuid())
+    recipe    Recipe? @relation(fields: [recipeId], references: [id])
+    recipeId  String?
+    produce   Produce @relation(fields: [produceId], references: [id])
+    produceId String
+    amount    Decimal
+    unit      Unit    @default(NONE)
 }
 
 model Recipe {
@@ -55,19 +53,11 @@ model Recipe {
 }
 
 model Group {
-    id             String        @id @default(cuid())
-    name           String
-    users          User[]
-    recipes        Recipe[]
-    shoppingList   ShoppingList? @relation(fields: [shoppingListId], references: [id])
-    shoppingListId String?       @unique
-}
-
-model ShoppingList {
-    id          String       @id @default(cuid())
-    user        User?
-    group       Group?
-    ingredients Ingredient[]
+    id                String   @id @default(cuid())
+    name              String
+    users             User[]
+    recipes           Recipe[]
+    selectedRecipeIds String[]
 }
 
 // Necessary for Next auth
@@ -98,17 +88,16 @@ model Session {
 }
 
 model User {
-    id             String        @id @default(cuid())
-    name           String?
-    email          String?       @unique
-    emailVerified  DateTime?
-    image          String?
-    accounts       Account[]
-    sessions       Session[]
-    groups         Group[]
-    recipes        Recipe[]
-    shoppingList   ShoppingList? @relation(fields: [shoppingListId], references: [id])
-    shoppingListId String?       @unique
+    id                String    @id @default(cuid())
+    name              String?
+    email             String?   @unique
+    emailVerified     DateTime?
+    image             String?
+    accounts          Account[]
+    sessions          Session[]
+    groups            Group[]
+    recipes           Recipe[]
+    selectedRecipeIds String[]
 }
 
 model VerificationToken {
