@@ -1,8 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
 import { Typography } from "./Typography";
 
@@ -14,14 +24,18 @@ interface PageProps {
 }
 
 export const Page = ({ title, children, actions, backLink }: PageProps) => {
+  const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
+  const { register, handleSubmit } = useForm<{ name: string }>();
+
   const utils = api.useContext();
   const { data: session } = useSession();
   const { data: groups } = api.groups.list.useQuery();
-  const { mutate } = api.groups.setActingGroup.useMutation();
+  const { mutate: mutateActingGroup } = api.groups.setActingGroup.useMutation();
+  const { mutate: createGroup } = api.groups.create.useMutation();
 
   const setActiveGroup = (groupId: string | null) => {
     if (!groupId) {
-      mutate(
+      mutateActingGroup(
         { groupId: undefined },
         {
           onSettled: () => {
@@ -31,7 +45,7 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
         }
       );
     } else {
-      mutate(
+      mutateActingGroup(
         { groupId },
         {
           onSettled: () => {
@@ -42,6 +56,15 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
       );
     }
   };
+
+  const onSubmit = handleSubmit((data: { name: string }) => {
+    createGroup(data, {
+      onSuccess: () => {
+        void utils.groups.list.invalidate();
+        setCreateGroupModalOpen(false);
+      },
+    });
+  });
 
   return (
     <div className="container mx-auto mt-8 content-center">
@@ -59,6 +82,7 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
         <div className="flex justify-end">
           {session && (
             <Combobox
+              onCreateNewGroup={() => setCreateGroupModalOpen(true)}
               defaultValue={session.user.actingGroupId || session.user.id}
               onChange={setActiveGroup}
               options={(groups || [])?.map((group) => ({
@@ -79,6 +103,39 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
         <div>{actions}</div>
       </div>
       {children}
+
+      <Dialog
+        open={createGroupModalOpen}
+        onOpenChange={setCreateGroupModalOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Would you like to create a new family group?
+            </DialogTitle>
+            <DialogDescription>
+              This will create a family group and assign your user to the newly
+              created group. You will be able to switch to the newly created
+              group after creation.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={(e) => void onSubmit(e)}>
+            <Input label="Name" {...register("name")} />
+
+            <div className="flex justify-end space-x-4">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setCreateGroupModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

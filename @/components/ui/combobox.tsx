@@ -5,6 +5,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -12,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
 import * as React from "react";
 
 type Option = {
@@ -25,12 +26,14 @@ export function Combobox({
   self,
   defaultValue,
   onChange,
+  onCreateNewGroup,
 }: {
   options: Option[];
   self: Option;
   defaultValue: string;
   // Null will return if setting to user instead of group
   onChange: (groupId: string | null) => void;
+  onCreateNewGroup: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(defaultValue);
@@ -81,6 +84,7 @@ export function Combobox({
               {self.label}
             </CommandItem>
           </CommandGroup>
+          <CommandSeparator />
           <CommandGroup heading="Groups">
             {options.map((option) => (
               <CommandItem
@@ -100,6 +104,10 @@ export function Combobox({
                 {option.label}
               </CommandItem>
             ))}
+            <CommandItem onSelect={onCreateNewGroup}>
+              <PlusCircle className={cn("mr-2 h-4 w-4")} />
+              Create a new group
+            </CommandItem>
           </CommandGroup>
         </Command>
       </PopoverContent>

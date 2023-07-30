@@ -14,6 +14,25 @@ export const groupsRouter = createTRPCRouter({
       },
     });
   }),
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // Could also set user acting group to newly created group
+      return await prisma.group.create({
+        data: {
+          name: input.name,
+          users: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+        },
+      });
+    }),
   setActingGroup: protectedProcedure
     .input(
       z.object({
