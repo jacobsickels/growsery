@@ -5,16 +5,14 @@ import { Paper } from "@/components/ui/paper";
 import { Pencil, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useActingGroups } from "~/components/ActingGroupProvider";
 import { Page } from "~/components/Page";
-import { usePusher } from "~/components/PusherProvider";
 import { api } from "~/utils/api";
 
 export const Recipes = () => {
   const { data: session } = useSession();
   const { actingGroupId } = useActingGroups();
-  const utils = api.useContext();
   const { data: recipes } = api.recipes.list.useQuery({
     groupId: actingGroupId,
   });
@@ -23,22 +21,7 @@ export const Recipes = () => {
 
   const { mutate } = api.shoppingList.update.useMutation();
 
-  const pusher = usePusher();
-
-  useEffect(() => {
-    const channelName = `${actingGroupId || (session?.user.id as string)}`;
-    const pusherChannel = pusher.subscribe(channelName);
-    pusherChannel.bind("updated-recipes", function (data: unknown) {
-      console.log("I updated recipe selections", data);
-
-      void utils.recipes.list.invalidate();
-      void utils.shoppingList.getSelectedRecipeIds.invalidate();
-    });
-
-    return () => {
-      pusher.unsubscribe(channelName);
-    };
-  }, []);
+  const utils = api.useContext();
 
   const onCheckChanged = useCallback(
     (recipeId: string) => (checked: boolean) => {
