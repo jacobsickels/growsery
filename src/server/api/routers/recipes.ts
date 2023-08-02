@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
+import { pusherServerClient } from "~/server/pusher";
 
 export const recipeRouter = createTRPCRouter({
   list: protectedProcedure
@@ -57,6 +58,12 @@ export const recipeRouter = createTRPCRouter({
           groupId: input.groupId,
         },
       });
+
+      await pusherServerClient.trigger(
+        `${input.groupId || ctx.session.user.id}`,
+        "updated-recipes",
+        {}
+      );
 
       return recipe;
     }),
