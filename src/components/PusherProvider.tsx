@@ -32,7 +32,7 @@ const PusherProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  return children;
+  return <>{children}</>;
 };
 
 function usePusher() {
