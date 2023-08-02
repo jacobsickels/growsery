@@ -11,11 +11,15 @@ export const recipeRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
+      const where = input.groupId
+        ? {
+            groupId: input.groupId,
+          }
+        : {
+            userId: ctx.session.user.id,
+          };
       return await prisma.recipe.findMany({
-        where: {
-          userId: ctx.session.user.id,
-          groupId: input.groupId,
-        },
+        where,
       });
     }),
   get: protectedProcedure
