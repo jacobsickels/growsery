@@ -30,7 +30,7 @@ const PusherProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       pusher.unsubscribe(channelName);
     };
-  }, []);
+  }, [actingGroupId]);
 
   return <>{children}</>;
 };
