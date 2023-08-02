@@ -5,20 +5,25 @@ import { Paper } from "@/components/ui/paper";
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback } from "react";
+import { useActingGroups } from "~/components/ActingGroupProvider";
 import { Page } from "~/components/Page";
 import { api } from "~/utils/api";
 
-export const Recipies = () => {
+export const Recipes = () => {
+  const { actingGroupId } = useActingGroups();
   const utils = api.useContext();
-  const { data: recipes } = api.recipes.list.useQuery();
-  const { data: selectedRecipes } = api.shoppingList.get.useQuery();
+  const { data: recipes } = api.recipes.list.useQuery({
+    groupId: actingGroupId,
+  });
+  const { data: selectedRecipes } =
+    api.shoppingList.getSelectedRecipeIds.useQuery({ actingGroupId });
 
   const { mutate } = api.shoppingList.update.useMutation();
 
   const onCheckChanged = useCallback(
     (recipeId: string) => (checked: boolean) => {
       mutate(
-        { adding: checked, recipeId },
+        { adding: checked, recipeId, actingGroupId },
         {
           onSettled: () => {
             void utils.shoppingList.invalidate();
@@ -70,8 +75,14 @@ export const Recipies = () => {
           </div>
         </Paper>
       ))}
+
+      <div className="my-8 flex justify-center">
+        <Link href="/shopping-list">
+          <Button>View Shopping List</Button>
+        </Link>
+      </div>
     </Page>
   );
 };
 
-export default Recipies;
+export default Recipes;

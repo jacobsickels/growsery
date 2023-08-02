@@ -33,18 +33,26 @@ export const groupsRouter = createTRPCRouter({
         },
       });
     }),
-  setActingGroup: protectedProcedure
-    .input(
-      z.object({
-        groupId: z.string().optional(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      return await prisma.user.update({
-        where: { id: ctx.session.user.id },
-        data: {
-          actingGroupId: input.groupId || null,
-        },
-      });
-    }),
+  // setActingGroup: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       groupId: z.string().optional(),
+  //     })
+  //   )
+  //   .mutation(async ({ input, ctx }) => {
+  //     const user = await prisma.user.update({
+  //       where: { id: ctx.session.user.id },
+  //       data: {
+  //         actingGroupId: input.groupId || null,
+  //       },
+  //     });
+
+  //     await pusherServerClient.trigger(
+  //       `user-${ctx.session.user.id}`,
+  //       "updated-acting-group",
+  //       {}
+  //     );
+
+  //     return user;
+  //   }),
 });

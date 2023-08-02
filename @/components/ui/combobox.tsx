@@ -24,19 +24,18 @@ type Option = {
 export function Combobox({
   options,
   self,
-  defaultValue,
+  value,
   onChange,
   onCreateNewGroup,
 }: {
   options: Option[];
   self: Option;
-  defaultValue: string;
+  value: string;
   // Null will return if setting to user instead of group
   onChange: (groupId: string | null) => void;
   onCreateNewGroup: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(defaultValue);
 
   const getButtonValue = () => {
     const groupOption = options.find((option) => option.value === value)?.label;
@@ -70,7 +69,6 @@ export function Combobox({
           <CommandGroup heading="User">
             <CommandItem
               onSelect={() => {
-                setValue(self.value);
                 setOpen(false);
                 onChange(null);
               }}
@@ -90,7 +88,6 @@ export function Combobox({
               <CommandItem
                 key={option.value}
                 onSelect={() => {
-                  setValue(option.value);
                   setOpen(false);
                   onChange(option.value);
                 }}

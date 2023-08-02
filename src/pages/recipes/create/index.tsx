@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { useActingGroups } from "~/components/ActingGroupProvider";
 import { Page } from "~/components/Page";
 import { api } from "~/utils/api";
 
@@ -18,16 +19,20 @@ type FormState = {
 
 export const CreateRecipe = () => {
   const router = useRouter();
+  const { actingGroupId } = useActingGroups();
   const { mutate } = api.recipes.upsert.useMutation();
 
   const { register, handleSubmit } = useForm<FormState>();
 
   const onSubmit = handleSubmit((data: FormState) => {
-    mutate(data, {
-      onSuccess: () => {
-        void router.push("/recipes");
-      },
-    });
+    mutate(
+      { ...data, groupId: actingGroupId },
+      {
+        onSuccess: () => {
+          void router.push("/recipes");
+        },
+      }
+    );
   });
 
   return (

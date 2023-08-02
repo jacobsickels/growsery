@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
+import { useActingGroups } from "./ActingGroupProvider";
+import { usePusher } from "./PusherProvider";
 import { Typography } from "./Typography";
 
 interface PageProps {
@@ -28,32 +30,35 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
   const { register, handleSubmit } = useForm<{ name: string }>();
 
   const utils = api.useContext();
-  const { data: session } = useSession();
-  const { data: groups } = api.groups.list.useQuery();
-  const { mutate: mutateActingGroup } = api.groups.setActingGroup.useMutation();
+  const { groups, actingGroupId, setActingGroupId } = useActingGroups();
+
+  const { data: session, update } = useSession();
   const { mutate: createGroup } = api.groups.create.useMutation();
+  const pusher = usePusher();
+
+  useEffect(() => {
+    const channelName = `user-${session?.user.id as string}`;
+    const pusherChannel = pusher.subscribe(channelName);
+    pusherChannel.bind("updated-acting-group", function (data: unknown) {
+      console.log("I updated my family group!", data);
+      update()
+        .then(() => {
+          void utils.recipes.list.invalidate();
+          void utils.shoppingList.get.invalidate();
+        })
+        .catch((error) => console.log(error));
+    });
+
+    return () => {
+      pusher.unsubscribe(channelName);
+    };
+  }, []);
 
   const setActiveGroup = (groupId: string | null) => {
     if (!groupId) {
-      mutateActingGroup(
-        { groupId: undefined },
-        {
-          onSettled: () => {
-            void utils.recipes.list.invalidate();
-            void utils.shoppingList.get.invalidate();
-          },
-        }
-      );
+      setActingGroupId(undefined);
     } else {
-      mutateActingGroup(
-        { groupId },
-        {
-          onSettled: () => {
-            void utils.recipes.list.invalidate();
-            void utils.shoppingList.get.invalidate();
-          },
-        }
-      );
+      setActingGroupId(groupId);
     }
   };
 
@@ -83,7 +88,7 @@ export const Page = ({ title, children, actions, backLink }: PageProps) => {
           {session && (
             <Combobox
               onCreateNewGroup={() => setCreateGroupModalOpen(true)}
-              defaultValue={session.user.actingGroupId || session.user.id}
+              value={actingGroupId || session.user.id}
               onChange={setActiveGroup}
               options={(groups || [])?.map((group) => ({
                 label: group.name,

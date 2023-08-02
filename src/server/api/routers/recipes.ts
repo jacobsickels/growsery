@@ -3,14 +3,20 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
 
 export const recipeRouter = createTRPCRouter({
-  list: protectedProcedure.query(async ({ ctx }) => {
-    return await prisma.recipe.findMany({
-      where: {
-        userId: ctx.session.user.id,
-        groupId: ctx.session.user.actingGroupId,
-      },
-    });
-  }),
+  list: protectedProcedure
+    .input(
+      z.object({
+        groupId: z.string().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      return await prisma.recipe.findMany({
+        where: {
+          userId: ctx.session.user.id,
+          groupId: input.groupId,
+        },
+      });
+    }),
   get: protectedProcedure
     .input(
       z.object({
@@ -38,6 +44,7 @@ export const recipeRouter = createTRPCRouter({
         name: z.string(),
         description: z.string().optional(),
         servings: z.number(),
+        groupId: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -47,7 +54,7 @@ export const recipeRouter = createTRPCRouter({
         create: {
           ...input,
           userId: ctx.session.user.id,
-          groupId: ctx.session.user.actingGroupId,
+          groupId: input.groupId,
         },
       });
 
@@ -82,7 +89,7 @@ export const recipeRouter = createTRPCRouter({
         ),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const recipe = await prisma.recipe.update({
         where: { id: input.id },
         data: {
