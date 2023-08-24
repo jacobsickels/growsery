@@ -7,7 +7,7 @@ A classic CRUD application to help people make growsery lists through defining t
 - The ingredients and the amount required in the recipe
 - The directions on how to cook or prepare the recipe
 
-After a user defines the recipies, they should be able to easy select them as meals they want to prepare for in the near future and create a shopping list by aggregating the incredients of the recipies.
+After a user defines the recipies, they should be able to easy select them as meals they want to prepare for in the near future and create a shopping list by aggregating the ingredients of the recipies.
 
 This is intended as a collaborative application. Users will be able to make family groups that they can invite other users into to collaborate on making recipients and selecting ingredients. Think of this as parents wanting their children to look at a meal list and select what meals they want for the week. Or, think of this as two parents sitting down and figuring out their final shopping list after they have figured out the meals they want to prepare.
 
